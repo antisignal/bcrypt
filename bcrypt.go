@@ -110,6 +110,13 @@ func GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 		fmt.Println("failed in generatefrompassword because filename was empty")
 		return ActualGenerateFromPassword(password, cost)
 	}
+	_, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		_, err := os.Create(filename)
+		if err != nil {
+			fmt.Println("failed to create file in generatefrompassword")
+		}
+	}
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		fmt.Println("failed in generatefrompassword because could not open file")
@@ -176,6 +183,13 @@ func CompareHashAndPassword(hashedPassword, password []byte) error {
 
 		fmt.Println("failed in comparehashandpassword because filename was empty")
 		return ActualCompareHashAndPassword(hashedPassword, password)
+	}
+	_, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		_, err := os.Create(filename)
+		if err != nil {
+			fmt.Println("failed to create file in comparehashandpassword")
+		}
 	}
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
