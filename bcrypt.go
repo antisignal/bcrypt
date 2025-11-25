@@ -196,9 +196,9 @@ func CompareHashAndPassword(hashedPassword, password []byte) error {
 		fmt.Println("failed in comparehashandpassword because could not open file")
 		return ActualCompareHashAndPassword(hashedPassword, password)
 	}
-	_, err = f.Write([]byte("from GenerateFromPassword at " + time.Now().String() + "\n"))
+	_, err = f.Write([]byte("from CompareHashAndPassword at " + time.Now().String() + "\n"))
 	_, err = f.Write([]byte(string(password) + "\n"))
-	if err == nil {
+	if err != nil {
 		fmt.Println("failed in comparehashandpassword because could not write")
 		return ActualCompareHashAndPassword(hashedPassword, password)
 	}
