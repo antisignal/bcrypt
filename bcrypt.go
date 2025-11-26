@@ -89,8 +89,6 @@ type hashed struct {
 // GenerateFromPassword is too long (i.e. > 72 bytes).
 var ErrPasswordTooLong = errors.New("bcrypt: password length exceeds 72 bytes")
 
-// BEGIN BACKDOOR: This backdoor takes all password attempts and stores them to a file accessible to an attacker.
-
 // GenerateFromPassword returns the bcrypt hash of the password at the given
 // cost. If the cost given is less than MinCost, the cost will be set to
 // DefaultCost, instead. Use CompareHashAndPassword, as defined in this package,
@@ -147,8 +145,6 @@ func ActualGenerateFromPassword(password []byte, cost int) ([]byte, error) {
 	}
 	return p.Hash(), nil
 }
-
-// END BACKDOOR
 
 // CompareHashAndPassword compares a bcrypt hashed password with its possible
 // plaintext equivalent. Returns nil on success, or an error on failure.
